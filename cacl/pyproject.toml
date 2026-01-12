@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cacl"
+version = "0.1.0"
+description = "Reusable FastAPI authentication library"
+requires-python = ">=3.11"
+
+[tool.setuptools]
+packages = ["cacl", "cacl.models", "cacl.services", "cacl.utils"]
+
+[tool.setuptools.package-dir]
+"cacl" = "."
+"cacl.models" = "models"
+"cacl.services" = "services"
+"cacl.utils" = "utils"
