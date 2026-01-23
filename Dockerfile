@@ -15,6 +15,7 @@ COPY ./cacl ./cacl
 RUN pip install -e ./cacl
 
 COPY ./app ./app
+COPY ./scripts ./scripts
 
 ENV PYTHONUNBUFFERED=1
 
