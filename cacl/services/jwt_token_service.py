@@ -1,4 +1,5 @@
 import logging
+import uuid
 from datetime import datetime, timedelta
 from typing import Literal, Optional
 
@@ -35,7 +36,7 @@ async def create_jwt_token(
     else:
         raise HTTPException(status_code=400, detail="Неверный тип токена")
 
-    payload = {"sub": str(user.id), "type": token_type, "exp": expire, "iat": now}
+    payload = {"sub": str(user.id), "type": token_type, "exp": expire, "iat": now, "jti": str(uuid.uuid4())}
     token = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
     db_token = JWTToken(
