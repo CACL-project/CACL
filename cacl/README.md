@@ -191,9 +191,9 @@ The model uses:
 
 ## Testing
 
-See [docs/testing.md](../docs/testing.md) for library test instructions.
+See `docs/testing.md` in the repository for library test instructions.
 
-For end-to-end verification of a demo app, see [docs/verification/auth_e2e.md](../docs/verification/auth_e2e.md).
+For end-to-end verification of a demo app, see `docs/verification/auth_e2e.md` in the repository.
 
 ## Compatibility
 
