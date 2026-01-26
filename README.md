@@ -1,4 +1,4 @@
-# CACL Repository
+# CACL - Configurable Authentication Control Library Repository
 
 This repository contains:
 
