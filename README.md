@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/logo.png" alt="CACL logo" width="180"/>
+</p>
+
 # CACL - Configurable Authentication Control Library Repository
 
 This repository contains:
