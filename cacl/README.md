@@ -1,4 +1,4 @@
-# CACL — FastAPI Authentication Library
+# CACL — Configurable Authentication Control Library. FastAPI Authentication Library
 
 A reusable JWT authentication library for FastAPI with database-backed token storage, blacklisting, and refresh token rotation.
 
@@ -20,8 +20,27 @@ CACL is a **library**, not an application. It does **not**:
 - Run Alembic migrations
 - Commit or rollback transactions
 - Define HTTP endpoints
+- Verify user credentials (password checking)
 
 Your application owns the database connection, session lifecycle, and transaction control.
+
+## Integration Contract
+
+Your application must:
+
+- Create the SQLAlchemy async engine and `async_sessionmaker`
+- Call `register_session_maker(async_session_maker)` at startup, before any requests
+- Define a User model satisfying `UserProtocol` (see below)
+- Set `CACL_USER_MODEL` environment variable to the dotted path of your User model
+- Call `await session.commit()` after `create_jwt_token()` or `blacklist_token()`
+- Include CACL's `JWTToken` model in Alembic migrations
+
+CACL will:
+
+- Provide `get_db_session()` FastAPI dependency using your registered session maker
+- Add token records to the session (without committing)
+- Mark tokens as blacklisted (without committing)
+- Roll back the session on exceptions in `get_db_session()`
 
 ## Installation
 
@@ -60,19 +79,36 @@ COOKIE_SAMESITE=Lax
 
 ### 1. Define Your User Model
 
-Your User model must satisfy `UserProtocol`:
+Your User model must satisfy `UserProtocol` from `cacl.types`:
 
 ```python
+from typing import Protocol
+
+class UserProtocol(Protocol):
+    id: str       # UUID as string or UUID object
+    is_active: bool
+    is_admin: bool
+```
+
+CACL requires only these three fields. Your model may include additional fields (email, password_hash, etc.), but CACL does not access them. Credential verification is your application's responsibility.
+
+**Minimal example:**
+
+```python
+import uuid
 from sqlalchemy import Column, Boolean
 from sqlalchemy.dialects.postgresql import UUID
+from your_app.db import Base
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(UUID(as_uuid=True), primary_key=True)
-    is_active = Column(Boolean, default=True)
-    is_admin = Column(Boolean, default=False)
-    # ... other fields
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    is_active = Column(Boolean, default=True, nullable=False)
+    is_admin = Column(Boolean, default=False, nullable=False)
+    # Application-specific fields (not used by CACL):
+    email = Column(String, unique=True, nullable=False)
+    password_hash = Column(String, nullable=True)
 ```
 
 ### 2. Register Session Maker at Startup
@@ -145,6 +181,23 @@ response = JSONResponse(content={"detail": "Logged out"})
 clear_auth_tokens(response)
 return response
 ```
+
+## Token Verification Flow
+
+When `get_current_user` or `verify_jwt_token` is called:
+
+1. Extract token from cookie (`access_token`) or `Authorization: Bearer` header
+2. Reject if token length exceeds 2048 characters (DoS protection)
+3. Decode JWT and verify signature using `JWT_SECRET_KEY`
+4. Reject if token is expired (`exp` claim)
+5. Reject if `token_type` claim does not match expected type
+6. Query `jwt_tokens` table for matching token record
+7. Reject if token not found or `is_blacklisted=True`
+8. Load user by `user_id` from token record
+9. Reject if user not found or `is_active=False`
+10. Return user object
+
+All rejections raise `HTTPException` with status 401 (Unauthorized).
 
 ## Security Notes
 

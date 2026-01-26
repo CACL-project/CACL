@@ -1,10 +1,10 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Development guidance for this repository.
 
 ## Project Overview
 
-CACL (Claude Authentication Control Library) is a reusable FastAPI authentication library that provides JWT-based authentication with support for both cookie and header-based token delivery. The repository contains both the library (`cacl/`) and a demo application (`app/`) that demonstrates its usage.
+CACL (Configurable Authentication Control Library) is a reusable FastAPI authentication library that provides JWT-based authentication with support for both cookie and header-based token delivery. The repository contains both the library (`cacl/`) and a demo application (`app/`) that demonstrates its usage.
 
 ## Development Commands
 
