@@ -47,7 +47,7 @@ async def test_get_current_admin_rejects_non_admin_user(session, active_user):
         await get_current_admin(current_user=active_user)
 
     assert exc_info.value.status_code == 403
-    assert "администратор" in exc_info.value.detail.lower()
+    assert "admin" in exc_info.value.detail.lower()
 
 
 @pytest.mark.asyncio

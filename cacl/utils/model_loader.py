@@ -7,8 +7,8 @@ _cached_user_model = None
 
 def get_user_model():
     """
-    Автоимпорт модели пользователя по пути из настроек CACL_USER_MODEL.
-    Пример: "app.models.users.User"
+    Import and return the User model class specified in CACL_USER_MODEL.
+    Example: "app.models.users.User"
     """
     global _cached_user_model
 

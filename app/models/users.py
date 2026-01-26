@@ -8,7 +8,7 @@ from cacl.models.base import Base
 
 class User(Base):
     """
-    User — модель пользователя.
+    User model for the demo application.
     """
     __tablename__ = "users"
 
@@ -30,13 +30,12 @@ class User(Base):
     def __repr__(self):
         return f"<User {self.email}>"
 
-    # методы безопасности
     def set_password(self, password: str):
-        """Создаёт bcrypt-хэш и сохраняет его в поле password_hash."""
+        """Hash password using bcrypt and store in password_hash field."""
         self.password_hash = bcrypt.hash(password)
 
     def verify_password(self, password: str) -> bool:
-        """Проверяет введённый пароль по хэшу."""
+        """Verify password against stored hash."""
         if not self.password_hash:
             return False
         return bcrypt.verify(password, self.password_hash)

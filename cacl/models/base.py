@@ -2,5 +2,5 @@ from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
-    """Базовый класс декларативных моделей CACL."""
+    """Base class for CACL declarative models."""
     pass

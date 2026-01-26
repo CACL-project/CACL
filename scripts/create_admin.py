@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 
 async def create_admin():
     """
-    Безопасное создание администратора в системе.
-    Поддерживает non-interactive режим через EMAIL и PASSWORD env vars.
+    Create an admin user in the system.
+    Supports non-interactive mode via EMAIL and PASSWORD env vars.
     """
-    logger.info("Запуск скрипта создания администратора")
+    logger.info("Starting admin creation script")
 
     email = os.getenv("EMAIL")
     password = os.getenv("PASSWORD")
@@ -27,23 +27,23 @@ async def create_admin():
     if email and password:
         email = email.strip().lower()
     else:
-        email = input("Введите email администратора: ").strip().lower()
+        email = input("Enter admin email: ").strip().lower()
         if not re.match(r"^[^@\s]+@[^@\s]+\.[a-zA-Z0-9]+$", email):
-            logger.error("Некорректный формат email: %s", email)
+            logger.error("Invalid email format: %s", email)
             return
 
-        password = getpass("Введите пароль администратора: ").strip()
-        password_confirm = getpass("Повторите пароль: ").strip()
+        password = getpass("Enter admin password: ").strip()
+        password_confirm = getpass("Confirm password: ").strip()
 
         if password != password_confirm:
-            logger.error("Пароли не совпадают.")
+            logger.error("Passwords do not match.")
             return
 
     if not re.match(r"^[^@\s]+@[^@\s]+\.[a-zA-Z0-9]+$", email):
-        logger.error("Некорректный формат email: %s", email)
+        logger.error("Invalid email format: %s", email)
         return
     if len(password) < 5:
-        logger.error("Пароль слишком короткий (мин. 5 символов).")
+        logger.error("Password too short (min 5 characters).")
         return
 
     async with async_session_maker() as session:
@@ -52,7 +52,7 @@ async def create_admin():
             existing_user = result.first()
 
             if existing_user:
-                logger.warning("Пользователь с email %s уже существует.", email)
+                logger.warning("User with email %s already exists.", email)
                 return
 
             new_admin = User(
@@ -65,23 +65,23 @@ async def create_admin():
 
             session.add(new_admin)
             await session.commit()
-            logger.info("Создан новый администратор: %s", email)
+            logger.info("Created new admin: %s", email)
 
         except IntegrityError:
             await session.rollback()
-            logger.error("Email (%s) уже используется.", email)
+            logger.error("Email (%s) already in use.", email)
         except SQLAlchemyError as e:
             await session.rollback()
-            logger.exception("Ошибка при работе с БД: %s", e)
+            logger.exception("Database error: %s", e)
         except Exception as e:
             await session.rollback()
-            logger.exception("Непредвиденная ошибка при создании администратора: %s", e)
+            logger.exception("Unexpected error creating admin: %s", e)
 
-    logger.info("Завершено создание администратора")
+    logger.info("Admin creation completed")
 
 
 if __name__ == "__main__":
     try:
         asyncio.run(create_admin())
     except KeyboardInterrupt:
-        logger.warning("Операция отменена пользователем.")
+        logger.warning("Operation cancelled by user.")

@@ -29,19 +29,19 @@ async def _authenticate_user(session: AsyncSession, email: str, password: str) -
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Неверный email или пароль",
+            detail="Invalid email or password",
         )
 
     if not user.verify_password(password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Неверный email или пароль",
+            detail="Invalid email or password",
         )
 
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Пользователь неактивен",
+            detail="User is inactive",
         )
 
     return user
@@ -55,7 +55,7 @@ async def _create_tokens_and_respond(session: AsyncSession, user: User) -> JSONR
     refresh_token = await create_jwt_token(session, user=user, token_type="refresh")
     await session.commit()
 
-    response = JSONResponse(content={"detail": "Успешный вход"})
+    response = JSONResponse(content={"detail": "Login successful"})
     set_auth_tokens(response, access_token, refresh_token)
     return response
 
@@ -95,7 +95,7 @@ async def admin_login(data: LoginRequest):
         if not user.is_admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Доступ только для администраторов",
+                detail="Admin access only",
             )
 
         return await _create_tokens_and_respond(session, user)
@@ -117,7 +117,7 @@ async def logout(
     if not refresh_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Refresh token отсутствует",
+            detail="Refresh token missing",
         )
 
     async with async_session_maker() as session:
@@ -138,7 +138,7 @@ async def logout(
 
         await session.commit()
 
-    response = JSONResponse(content={"detail": "Выход выполнен"})
+    response = JSONResponse(content={"detail": "Logged out"})
     clear_auth_tokens(response)
     return response
 
@@ -157,7 +157,7 @@ async def refresh(
     if not refresh_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Refresh token отсутствует",
+            detail="Refresh token missing",
         )
 
     async with async_session_maker() as session:
@@ -169,6 +169,6 @@ async def refresh(
         new_refresh_token = await create_jwt_token(session, user=user, token_type="refresh")
         await session.commit()
 
-        response = JSONResponse(content={"detail": "Токены обновлены"})
+        response = JSONResponse(content={"detail": "Tokens refreshed"})
         set_auth_tokens(response, access_token, new_refresh_token)
         return response

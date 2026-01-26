@@ -1,4 +1,4 @@
-# CACL — Configurable Authentication Control Library. FastAPI Authentication Library
+# CACL — Clear Authentication Control Library
 
 A reusable JWT authentication library for FastAPI with database-backed token storage, blacklisting, and refresh token rotation.
 
