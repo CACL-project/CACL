@@ -21,7 +21,7 @@ async def test_inactive_user_rejected(session, inactive_user):
         await verify_jwt_token(session, token, token_type="access")
 
     assert exc_info.value.status_code == 401
-    assert "неактивен" in exc_info.value.detail.lower()
+    assert "inactive" in exc_info.value.detail.lower()
 
 
 @pytest.mark.asyncio

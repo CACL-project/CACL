@@ -6,9 +6,8 @@ async_session_maker: Optional[async_sessionmaker[AsyncSession]] = None
 
 def register_session_maker(session_maker: async_sessionmaker[AsyncSession]) -> None:
     """
-    Регистрирует async_sessionmaker из проекта.
-    Библиотека НЕ создаёт собственный engine, а использует тот,
-    который передал основной проект.
+    Register the application's async_sessionmaker with CACL.
+    CACL does not create its own engine; it uses the one provided by the application.
     """
     global async_session_maker
     async_session_maker = session_maker

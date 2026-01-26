@@ -9,8 +9,8 @@ from cacl.models.base import Base
 
 class JWTToken(Base):
     """
-    Таблица хранения JWT-токенов (access и refresh).
-    Позволяет контролировать срок жизни и отзыв (blacklist).
+    Database model for JWT token storage.
+    Supports access and refresh tokens with expiration and blacklist control.
     """
     __tablename__ = "jwt_tokens"
 
@@ -22,7 +22,7 @@ class JWTToken(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     token = Column(Text, unique=True, nullable=False)
-    token_type = Column(String, nullable=False)        # "access" или "refresh"
+    token_type = Column(String, nullable=False)  # "access" or "refresh"
     is_blacklisted = Column(Boolean, default=False)
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

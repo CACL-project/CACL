@@ -23,8 +23,8 @@ class Settings:
     COOKIE_ACCESS_NAME = "access_token"
     COOKIE_REFRESH_NAME = "refresh_token"
     COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN")
-    COOKIE_SECURE = False  # Только HTTPS,  True - прод
-    COOKIE_HTTPONLY = True  # Нельзя прочитать из JS
+    COOKIE_SECURE = False  # Set True in production (HTTPS only)
+    COOKIE_HTTPONLY = True  # Not accessible from JavaScript
     COOKIE_SAMESITE = "Lax"
 
 

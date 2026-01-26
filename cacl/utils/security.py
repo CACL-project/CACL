@@ -4,11 +4,10 @@ from cacl.settings import settings
 
 def set_auth_tokens(response: JSONResponse, access_token: str, refresh_token: str):
     """
-    Универсальный механизм сохранения токенов:
-    - Если включён cookie-режим: ставим HttpOnly куки
-    - Иначе — добавляем токены в тело ответа
+    Set authentication tokens on response.
+    Cookie mode: sets HttpOnly cookies.
+    Header mode: adds tokens to response body.
     """
-
     if settings.USE_COOKIE_AUTH:
         response.set_cookie(
             key=settings.COOKIE_ACCESS_NAME,
@@ -28,9 +27,7 @@ def set_auth_tokens(response: JSONResponse, access_token: str, refresh_token: st
             domain=settings.COOKIE_DOMAIN,
             max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
         )
-
     else:
-        # Старый JSON-формат (при разработке)
         response.body = response.render({
             "tokens": {
                 "access_token": access_token,
@@ -41,7 +38,7 @@ def set_auth_tokens(response: JSONResponse, access_token: str, refresh_token: st
 
 
 def clear_auth_tokens(response: JSONResponse):
-    """Удаление токенов при logout"""
+    """Clear authentication cookies on logout."""
     if settings.USE_COOKIE_AUTH:
         response.delete_cookie(settings.COOKIE_ACCESS_NAME, domain=settings.COOKIE_DOMAIN)
         response.delete_cookie(settings.COOKIE_REFRESH_NAME, domain=settings.COOKIE_DOMAIN)

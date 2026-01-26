@@ -6,11 +6,11 @@ load_dotenv()
 
 class Settings:
     """
-    Настройки CACL читаются напрямую из окружения (.env),
-    но НЕ зависят от app.settings.
+    CACL settings loaded from environment variables.
+    Independent of application settings.
     """
 
-    # Путь до модели пользователя, например: "app.models.users.User"
+    # Path to User model class, e.g.: "app.models.users.User"
     CACL_USER_MODEL: str | None = os.getenv("CACL_USER_MODEL")
 
     # JWT

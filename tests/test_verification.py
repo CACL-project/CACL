@@ -66,7 +66,7 @@ async def test_verify_blacklisted_token_rejected(session, active_user):
         await verify_jwt_token(session, token, token_type="access")
 
     assert exc_info.value.status_code == 401
-    assert "недействителен" in exc_info.value.detail.lower()
+    assert "invalid" in exc_info.value.detail.lower()
 
 
 @pytest.mark.asyncio
@@ -81,7 +81,7 @@ async def test_verify_wrong_token_type_rejected(session, active_user):
         await verify_jwt_token(session, token, token_type="access")
 
     assert exc_info.value.status_code == 401
-    assert "тип" in exc_info.value.detail.lower()
+    assert "type" in exc_info.value.detail.lower()
 
 
 @pytest.mark.asyncio
