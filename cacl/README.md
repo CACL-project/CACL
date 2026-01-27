@@ -54,6 +54,24 @@ Or for development:
 pip install -e ./cacl
 ```
 
+## Database Requirements
+
+**PostgreSQL is required.** CACL uses PostgreSQL-specific features (UUID columns) and is not compatible with SQLite or other databases.
+
+CACL does not bundle, configure, or start a database. Your application must:
+
+1. Provision a PostgreSQL database
+2. Provide the connection URL to SQLAlchemy
+3. Run migrations to create the `jwt_tokens` table
+
+Example connection URL format:
+
+```
+postgresql+asyncpg://user:password@host:5432/dbname
+```
+
+For testing, provide a separate test database (e.g., `cacl_test`).
+
 ## Required Environment Variables
 
 ```bash
@@ -79,7 +97,7 @@ COOKIE_SAMESITE=Lax
 
 ### 1. Define Your User Model
 
-Your User model must satisfy `UserProtocol` from `cacl.types`:
+Your User model must satisfy `UserProtocol` from `cacl.protocols`:
 
 ```python
 from typing import Protocol

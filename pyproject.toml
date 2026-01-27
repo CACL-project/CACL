@@ -28,7 +28,8 @@ dependencies = [
 
 [project.optional-dependencies]
 postgres = [
-  "asyncpg>=0.29.0",
+    "asyncpg>=0.29.0",
+    "greenlet>=3.0.0",
 ]
 test = [
     "pytest>=8.0.0",
