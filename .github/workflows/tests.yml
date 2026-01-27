@@ -48,7 +48,7 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-test.txt
           pip install asyncpg
-          pip install -e ./cacl
+          pip install -e .
 
       - name: Run tests
         run: python -m pytest tests/ -q
@@ -56,6 +56,6 @@ jobs:
       - name: Verify packaging
         run: |
           pip install build
-          cd cacl && python -m build --quiet
+          python -m build --quiet
           test -f dist/cacl-*.whl
           test -f dist/cacl-*.tar.gz
