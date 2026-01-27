@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="docs/assets/logo.png" alt="CACL logo" width="300"/>
+  <img
+  src="https://raw.githubusercontent.com/CACL-project/CACL/main/docs/assets/logo.png"
+  alt="CACL logo"
+  width="300"
+/>
 </p>
 
 # CACL - Clear Authentication Control Library
