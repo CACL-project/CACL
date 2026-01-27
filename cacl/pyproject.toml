@@ -8,11 +8,10 @@ version = "0.1.0"
 description = "Reusable FastAPI authentication library with JWT tokens and database-backed blacklisting"
 readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "MIT"}
+license = "MIT"
 authors = [{ name = "Anton Serebriakov" }]
 classifiers = [
     "Development Status :: 4 - Beta",
-    "License :: OSI Approved :: MIT License",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
