@@ -82,8 +82,31 @@ The test suite validates:
 ======================= 36 passed in X.XXs =====================================
 ```
 
+## Running Tests Without Docker (CI)
+
+For CI environments or local testing without Docker, set the following environment variables:
+
+```bash
+export TEST_DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/cacl_test
+export JWT_SECRET_KEY=test_secret_key
+export CACL_USER_MODEL=tests.conftest.TestUser
+```
+
+Then run:
+
+```bash
+pip install -r requirements.txt
+pip install -r requirements-test.txt
+pip install asyncpg
+pip install -e ./cacl
+python -m pytest tests/ -v
+```
+
+PostgreSQL must be running and the `cacl_test` database must exist.
+
 ## Notes
 
 - Tests use a separate `cacl_test` database
 - Each test creates and drops tables for isolation
 - The TestUser model in conftest.py satisfies UserProtocol
+- PostgreSQL is required (SQLite is not supported)
