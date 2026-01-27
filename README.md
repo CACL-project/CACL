@@ -4,6 +4,8 @@
 
 # CACL - Clear Authentication Control Library
 
+Maintainer: Anton Serebriakov
+
 This repository contains:
 
 - **`cacl/`** — Reusable FastAPI authentication library ([documentation](cacl/README.md))
