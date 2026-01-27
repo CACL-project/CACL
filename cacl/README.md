@@ -1,6 +1,10 @@
 # CACL — Clear Authentication Control Library
 
-A reusable JWT authentication library for FastAPI with database-backed token storage, blacklisting, and refresh token rotation.
+**Stop fighting auth in FastAPI. Use CACL.**
+
+CACL is a **library** (not an app/framework) that gives you **database-backed control** over JWT auth:
+**access & refresh tokens**, **blacklisting**, **refresh rotation**, and **cookie or Bearer modes** — with **explicit transaction ownership**.
+
 
 ## Features
 
@@ -272,6 +276,14 @@ For end-to-end verification of a demo app, see `docs/verification/auth_e2e.md` i
 - FastAPI
 - SQLAlchemy 2.x (async)
 - PostgreSQL (for UUID support)
+
+## Demo Application
+
+This repository includes a full FastAPI demo application
+showing real-world usage of CACL with PostgreSQL, Alembic,
+and JWT flows.
+
+ https://github.com/CACL-project/CACL
 
 ## Versioning
 
