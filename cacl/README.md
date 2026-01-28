@@ -1,10 +1,6 @@
 # CACL — Clear Authentication Control Library
 
-**Stop fighting auth in FastAPI. Use CACL.**
-
-CACL is a **library** (not an app/framework) that gives you **database-backed control** over JWT auth:
-**access & refresh tokens**, **blacklisting**, **refresh rotation**, and **cookie or Bearer modes** — with **explicit transaction ownership**.
-
+A reusable JWT authentication library for FastAPI with database-backed token storage, blacklisting, and refresh token rotation.
 
 ## Features
 
