@@ -39,7 +39,7 @@ You own the database and transactions — **CACL handles token mechanics.**
 CACL supports both browser and API authentication flows:
 
 - **Cookie-based auth** for web applications
-- **Authorization: Bearer** tokens for APIs and services
+- **Bearer tokens** via `Authorization` header for APIs and services
 
 Switching between them requires **changing a single configuration flag**.
 
@@ -102,7 +102,7 @@ CACL integrates into it — cleanly and predictably.
 ## Installation
 
 ```bash
-pip install cacl[postgres]
+pip install cacl
 ```
 
 ---
