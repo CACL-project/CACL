@@ -1,6 +1,6 @@
 <p align="center">
   <img
-    src="https://raw.githubusercontent.com/CACL-project/CACL/main/docs/assets/logo2.jpeg"
+    src="https://raw.githubusercontent.com/CACL-project/CACL/main/docs/assets/logo_pypi.png"
     alt="CACL logo"
     width="360"
   />
