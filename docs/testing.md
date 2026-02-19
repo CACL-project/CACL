@@ -38,7 +38,8 @@ tests/
 ├── test_verification.py  # Token verification tests
 ├── test_blacklist.py     # Token blacklisting tests
 ├── test_dependencies.py  # FastAPI dependency tests
-└── test_edge_cases.py    # Edge cases (jti, inactive users, etc.)
+├── test_edge_cases.py    # Edge cases (jti, inactive users, etc.)
+└── test_bearer_mode.py   # Bearer mode: schemas, response format
 ```
 
 ## Test Coverage
@@ -74,12 +75,17 @@ The test suite validates:
    - Multiple tokens per user
    - Token uniqueness (jti)
 
+6. **Bearer Mode**
+   - Pydantic schema validation (RefreshRequest, LogoutRequest)
+   - Token response format (set_auth_tokens)
+   - Cookie mode body unchanged
+
 ## Expected Output
 
 ```
 ============================= test session starts ==============================
 ...
-======================= 36 passed in X.XXs =====================================
+======================= 47 passed in X.XXs =====================================
 ```
 
 ## Running Tests Without Docker (CI)
@@ -110,3 +116,16 @@ PostgreSQL must be running and the `cacl_test` database must exist.
 - Each test creates and drops tables for isolation
 - The TestUser model in conftest.py satisfies UserProtocol
 - PostgreSQL is required (SQLite is not supported)
+
+## Changing Auth Mode for Testing
+
+To test Bearer mode instead of Cookie mode:
+
+1. Edit `.env` and set `USE_COOKIE_AUTH=false`
+2. **Recreate** the container (restart is not sufficient):
+   ```bash
+   docker compose down && docker compose up -d
+   ```
+3. Run tests as usual
+
+Environment variables are loaded at container creation. A `docker compose restart` does NOT reload `.env` values.

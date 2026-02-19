@@ -1,51 +1,55 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy import select
+import logging
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
 
 from app.db import async_session_maker
-from app.models.users import User
 from app.routes.auth import router as auth_router
+from app.routes.users import router as users_router
+from app.settings import settings as app_settings
 from cacl.db import register_session_maker
-from cacl.dependencies import get_current_user, get_current_admin
+from cacl.settings import settings as cacl_settings
+
+logger = logging.getLogger(__name__)
+
+
+def validate_auth_mode_consistency():
+    """
+    Validate that demo app and library have consistent USE_COOKIE_AUTH setting.
+    Both must read from the same environment variable, so a mismatch indicates
+    a configuration problem (e.g., stale cache, different .env files).
+    """
+    app_mode = app_settings.USE_COOKIE_AUTH
+    lib_mode = cacl_settings.USE_COOKIE_AUTH
+
+    if app_mode != lib_mode:
+        raise RuntimeError(
+            f"Configuration mismatch detected!\n"
+            f"  app.settings.USE_COOKIE_AUTH = {app_mode}\n"
+            f"  cacl.settings.USE_COOKIE_AUTH = {lib_mode}\n\n"
+            f"Both the demo app and the CACL library must use the same auth mode.\n"
+            f"This typically happens when:\n"
+            f"  1. You changed USE_COOKIE_AUTH in .env but didn't recreate the container\n"
+            f"  2. Multiple .env files exist with different values\n\n"
+            f"Fix: Ensure USE_COOKIE_AUTH is set consistently in your .env file,\n"
+            f"then recreate the container (restart is NOT sufficient):\n"
+            f"  docker compose down && docker compose up -d\n"
+            f"Or: docker compose up -d --force-recreate"
+        )
+
+    mode_name = "Cookie" if app_mode else "Bearer"
+    logger.info(f"Auth mode: {mode_name} (USE_COOKIE_AUTH={app_mode})")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    validate_auth_mode_consistency()
+    yield
+
 
 register_session_maker(async_session_maker)
 
-app = FastAPI(title="CACL Demo App")
+app = FastAPI(title="CACL Demo App", lifespan=lifespan)
 
 app.include_router(auth_router)
-
-
-@app.get("/me")
-async def get_my_profile(user=Depends(get_current_user)):
-    """
-    Returns current user profile.
-    """
-    return {
-        "id": str(user.id),
-        "email": user.email,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "is_admin": user.is_admin,
-        "is_active": user.is_active,
-    }
-
-
-@app.get("/admin/users")
-async def list_users(admin=Depends(get_current_admin)):
-    """
-    Returns list of all users (admin only).
-    """
-    async with async_session_maker() as session:
-        result = await session.execute(select(User))
-        users = result.scalars().all()
-
-        return [
-            {
-                "id": str(u.id),
-                "email": u.email,
-                "first_name": u.first_name,
-                "last_name": u.last_name,
-                "is_admin": u.is_admin,
-                "is_active": u.is_active,
-            }
-            for u in users
-        ]
+app.include_router(users_router)

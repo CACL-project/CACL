@@ -10,12 +10,15 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install CACL library in development mode
+# Copy CACL library and its pyproject.toml, then install in dev mode
+COPY pyproject.toml .
+COPY README_PYPI.md .
 COPY ./cacl ./cacl
-RUN pip install -e ./cacl
+RUN pip install -e .
 
 COPY ./app ./app
 COPY ./scripts ./scripts
+COPY ./tests ./tests
 
 ENV PYTHONUNBUFFERED=1
 
