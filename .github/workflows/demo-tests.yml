@@ -1,0 +1,60 @@
+name: Demo Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'examples/demo_app/**'
+      - '.github/workflows/demo-tests.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'examples/demo_app/**'
+      - '.github/workflows/demo-tests.yml'
+
+defaults:
+  run:
+    working-directory: examples/demo_app
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create .env from sample
+        run: cp .env.sample .env
+
+      - name: Build and start containers
+        run: docker compose up -d --build --wait
+
+      - name: Run migrations
+        run: docker compose exec -T web alembic upgrade head
+
+      - name: Create test user
+        run: |
+          docker compose exec -T web python -m demo_app.scripts.create_user \
+            --email test@example.com \
+            --password testpass123
+
+      - name: Health check
+        run: |
+          curl -f http://localhost:8001/docs || exit 1
+
+      - name: Test login endpoint
+        run: |
+          response=$(curl -s -w "\n%{http_code}" -X POST http://localhost:8001/auth/login \
+            -H "Content-Type: application/json" \
+            -d '{"email": "test@example.com", "password": "testpass123"}')
+          http_code=$(echo "$response" | tail -n1)
+          if [ "$http_code" != "200" ]; then
+            echo "Login failed with status $http_code"
+            echo "$response"
+            exit 1
+          fi
+          echo "Login successful"
+
+      - name: Cleanup
+        if: always()
+        run: docker compose down -v

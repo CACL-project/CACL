@@ -1,0 +1,12 @@
+# CACL library from PyPI
+cacl[postgres]>=0.1.7
+
+# Demo app dependencies
+uvicorn>=0.34.0
+alembic>=1.16.0
+httpx>=0.28.0
+email-validator>=2.1.0
+
+# Password hashing (bcrypt<5 required for passlib compatibility)
+passlib==1.7.4
+bcrypt==3.2.2

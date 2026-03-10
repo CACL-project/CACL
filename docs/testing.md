@@ -2,37 +2,45 @@
 
 This document describes how to run the automated test suite for the `cacl` authentication library.
 
-## Prerequisites
+## Running Tests (Docker)
 
-- Docker and Docker Compose
-- The demo application containers running (`docker compose up -d`)
-
-## Running Tests
-
-Tests run inside the Docker container against a dedicated test database.
-
-### 1. Ensure containers are running
+The recommended way to run tests locally is via Docker Compose from the library package directory:
 
 ```bash
-docker compose up -d
+cd packages/cacl
+docker compose -f docker-compose.test.yml run --rm test
 ```
 
-### 2. Create the test database (first time only)
+This command:
+1. Starts a PostgreSQL 15 container
+2. Installs pinned dependencies from `requirements.txt`
+3. Installs the library in editable mode
+4. Runs the full test suite
+5. Cleans up containers on exit
+
+No local Python or PostgreSQL installation required.
+
+### Cleanup
 
 ```bash
-docker compose exec db psql -U postgres -c "CREATE DATABASE cacl_test;"
+docker compose -f docker-compose.test.yml down -v
 ```
 
-### 3. Run the test suite
+## Running Tests (CI)
 
-```bash
-docker compose exec web python -m pytest tests/ -v
-```
+Tests run automatically in GitHub Actions on push/PR to main when library files change:
+1. PostgreSQL service container starts
+2. Pinned dependencies installed via `pip install -r requirements.txt`
+3. Library installed via `pip install -e . --no-deps`
+4. Runs `pytest tests/`
+
+CI uses pinned dependencies (`==` versions) for deterministic builds.
+See `.github/workflows/library-tests.yml` and `packages/cacl/requirements.txt` for details.
 
 ## Test Structure
 
 ```
-tests/
+packages/cacl/tests/
 ├── conftest.py           # Fixtures: engine, session, test users
 ├── test_jwt_tokens.py    # Token creation tests
 ├── test_verification.py  # Token verification tests
@@ -80,52 +88,9 @@ The test suite validates:
    - Token response format (set_auth_tokens)
    - Cookie mode body unchanged
 
-## Expected Output
-
-```
-============================= test session starts ==============================
-...
-======================= 47 passed in X.XXs =====================================
-```
-
-## Running Tests Without Docker (CI)
-
-For CI environments or local testing without Docker, set the following environment variables:
-
-```bash
-export TEST_DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/cacl_test
-export JWT_SECRET_KEY=test_secret_key
-export CACL_USER_MODEL=tests.conftest.TestUser
-```
-
-Then run:
-
-```bash
-pip install -r requirements.txt
-pip install -r requirements-test.txt
-pip install asyncpg
-pip install -e ./cacl
-python -m pytest tests/ -v
-```
-
-PostgreSQL must be running and the `cacl_test` database must exist.
-
 ## Notes
 
 - Tests use a separate `cacl_test` database
 - Each test creates and drops tables for isolation
 - The TestUser model in conftest.py satisfies UserProtocol
 - PostgreSQL is required (SQLite is not supported)
-
-## Changing Auth Mode for Testing
-
-To test Bearer mode instead of Cookie mode:
-
-1. Edit `.env` and set `USE_COOKIE_AUTH=false`
-2. **Recreate** the container (restart is not sufficient):
-   ```bash
-   docker compose down && docker compose up -d
-   ```
-3. Run tests as usual
-
-Environment variables are loaded at container creation. A `docker compose restart` does NOT reload `.env` values.

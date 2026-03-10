@@ -12,11 +12,12 @@ This document describes how to run the complete authentication verification suit
 
 ## Running the Verification
 
-From the repository root:
+From the `examples/demo_app/` directory:
 
 ```bash
-chmod +x scripts/verify_auth_e2e.sh
-./scripts/verify_auth_e2e.sh
+cd demo
+chmod +x verify_auth_e2e.sh
+./verify_auth_e2e.sh
 ```
 
 The script will:
@@ -147,13 +148,14 @@ lsof -i :5432
 ### Database connection errors
 Ensure the database container is healthy:
 ```bash
+cd demo
 docker compose ps
 docker compose logs db
 ```
 
 ### Script permission denied
 ```bash
-chmod +x scripts/verify_auth_e2e.sh
+chmod +x examples/demo_app/verify_auth_e2e.sh
 ```
 
 ### Stale code after local changes
@@ -161,11 +163,13 @@ The container runs uvicorn without `--reload`. If you modify source files locall
 
 **Solution:** Restart the container after code changes:
 ```bash
+cd demo
 docker restart cacl_demo_web
 ```
 
 Or rebuild if you've changed dependencies:
 ```bash
+cd demo
 docker compose build --no-cache && docker compose up -d
 ```
 
@@ -177,6 +181,8 @@ Environment variables are read at container creation time. A simple `docker comp
 
 **Correct way to switch auth modes:**
 ```bash
+cd demo
+
 # 1. Edit .env
 #    USE_COOKIE_AUTH=false  (for Bearer mode)
 #    USE_COOKIE_AUTH=true   (for Cookie mode)

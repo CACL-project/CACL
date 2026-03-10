@@ -10,14 +10,14 @@
 
 Maintainer: Anton Serebriakov
 
-This repository contains:
+This monorepo contains:
 
-- **`cacl/`** — Reusable FastAPI authentication library ([documentation](cacl/README.md))
-- **`app/`** — Demo application demonstrating library usage
+- **`packages/cacl/`** — Reusable FastAPI authentication library ([documentation](packages/cacl/cacl/README.md))
+- **`examples/demo_app/`** — Demo application demonstrating library usage (installs CACL from PyPI)
 
 ## Library Documentation
 
-See [cacl/README.md](cacl/README.md) for installation, configuration, and usage.
+See [packages/cacl/cacl/README.md](packages/cacl/cacl/README.md) for installation, configuration, and usage.
 
 ## Testing
 
@@ -27,8 +27,17 @@ See [cacl/README.md](cacl/README.md) for installation, configuration, and usage.
 ## Quick Start (Demo App)
 
 ```bash
+cd examples/demo_app
+cp .env.sample .env
 docker compose up -d --build
 docker compose exec web alembic upgrade head
 ```
 
 Then visit http://localhost:8001/docs for the API documentation.
+
+## Running Library Tests
+
+```bash
+cd packages/cacl
+docker compose -f docker-compose.test.yml run --rm test
+```
