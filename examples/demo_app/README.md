@@ -18,10 +18,14 @@ docker compose up -d --build
 # Run migrations
 docker compose exec web alembic upgrade head
 
-# Create a test user
-docker compose exec web python -m demo_app.scripts.create_user \
-  --email test@example.com \
-  --password testpass123
+# Create a test user (non-interactive via env vars)
+docker compose exec \
+  -e EMAIL=test@example.com \
+  -e PASSWORD=testpass123 \
+  web python -m demo_app.scripts.create_user
+
+# Or interactively
+docker compose exec web python -m demo_app.scripts.create_user
 ```
 
 Visit http://localhost:8001/docs for the API documentation.

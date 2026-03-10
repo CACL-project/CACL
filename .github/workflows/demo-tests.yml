@@ -34,9 +34,10 @@ jobs:
 
       - name: Create test user
         run: |
-          docker compose exec -T web python -m demo_app.scripts.create_user \
-            --email test@example.com \
-            --password testpass123
+          docker compose exec -T \
+            -e EMAIL=test@example.com \
+            -e PASSWORD=testpass123 \
+            web python -m demo_app.scripts.create_user
 
       - name: Health check
         run: |

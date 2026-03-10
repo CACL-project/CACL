@@ -124,8 +124,8 @@ pip install cacl
 
 ## Documentation & demo
 
-- **Library documentation:** [cacl/](https://github.com/CACL-project/CACL/tree/main/cacl)
-- **Demo FastAPI application:** [demo/](https://github.com/CACL-project/CACL/tree/main/demo)
+- **Library documentation:** [packages/cacl/cacl/](https://github.com/CACL-project/CACL/tree/main/packages/cacl/cacl)
+- **Demo FastAPI application:** [examples/demo_app/](https://github.com/CACL-project/CACL/tree/main/examples/demo_app)
 - Design notes, testing, and verification docs are included in the repository
 
 ---
