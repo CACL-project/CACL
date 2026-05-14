@@ -3,7 +3,7 @@ from datetime import datetime
 from passlib.hash import bcrypt
 from sqlalchemy import Column, String, Boolean, DateTime
 from sqlalchemy.dialects.postgresql import UUID
-from cacl.models.base import Base
+from demo_app.core.base import Base
 
 
 class User(Base):

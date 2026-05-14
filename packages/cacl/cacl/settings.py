@@ -1,7 +1,13 @@
+import logging
 import os
+import warnings
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger("cacl.settings")
+
+_DEV_SECRET = "CHANGE_ME_DEV_SECRET"
 
 
 class Settings:
@@ -14,7 +20,7 @@ class Settings:
     CACL_USER_MODEL: str | None = os.getenv("CACL_USER_MODEL")
 
     # JWT
-    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "CHANGE_ME_DEV_SECRET")
+    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", _DEV_SECRET)
     JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
     REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "1"))
@@ -30,3 +36,11 @@ class Settings:
 
 
 settings = Settings()
+
+if settings.JWT_SECRET_KEY == _DEV_SECRET:
+    warnings.warn(
+        "CACL: JWT_SECRET_KEY is set to the default development value ('CHANGE_ME_DEV_SECRET'). "
+        "Set a strong, unique JWT_SECRET_KEY in your environment before deploying to production.",
+        UserWarning,
+        stacklevel=1,
+    )

@@ -8,10 +8,18 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 from demo_app.core.settings import settings
-from cacl.models.base import Base
-# Import models to register them with Base.metadata
-from demo_app.models.users import User  # noqa
-from cacl.models.jwt_token import JWTToken  # noqa
+
+# Import both declarative bases so autogenerate sees all tables.
+# demo_app.User lives on its own Base (demo_app.core.base.Base),
+# while CACL's JWTToken lives on cacl.models.base.Base.
+# Keeping them separate means your app models are never forced to
+# share CACL's metadata.
+from demo_app.core.base import Base as AppBase
+from cacl.models.base import Base as CACLBase
+
+# Import models so their metadata is populated before autogenerate runs.
+from demo_app.models.users import User  # noqa — registers with AppBase.metadata
+from cacl.models.jwt_token import JWTToken  # noqa — registers with CACLBase.metadata
 
 config = context.config
 
@@ -24,7 +32,8 @@ config.set_main_option(
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = Base.metadata
+# Pass both metadata objects so Alembic autogenerate detects all tables.
+target_metadata = [AppBase.metadata, CACLBase.metadata]
 
 
 def run_migrations_offline() -> None:

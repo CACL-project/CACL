@@ -22,7 +22,7 @@ async def _extract_token(request: Request, access_cookie: str | None) -> str | N
         return access_cookie
 
     auth_header = request.headers.get("Authorization")
-    if auth_header and auth_header.startswith("Bearer "):
+    if auth_header and auth_header.lower().startswith("bearer "):
         return auth_header.split(" ", 1)[1]
 
     return None

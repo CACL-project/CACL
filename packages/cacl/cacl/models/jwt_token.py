@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, String, Text, Boolean, DateTime, ForeignKey, Index
+from sqlalchemy import Column, String, Text, Boolean, DateTime, Index
 from sqlalchemy.dialects.postgresql import UUID
 
 from cacl.models.base import Base
@@ -11,6 +11,16 @@ class JWTToken(Base):
     """
     Database model for JWT token storage.
     Supports access and refresh tokens with expiration and blacklist control.
+
+    NOTE: user_id is a plain UUID column with an index.
+    CACL intentionally does NOT define a database-level foreign key to the users table.
+    This decouples CACL from your application's ORM base class and table structure.
+
+    Security contract: token verification still loads the current user via get_user_model()
+    and rejects the token if the user does not exist or is inactive.
+
+    Orphaned tokens: if your application hard-deletes users, you are responsible for
+    removing the related jwt_tokens rows in your application layer or via a cleanup job.
     """
     __tablename__ = "jwt_tokens"
 
@@ -19,7 +29,7 @@ class JWTToken(Base):
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), nullable=False, index=True)
 
     token = Column(Text, unique=True, nullable=False)
     token_type = Column(String, nullable=False)  # "access" or "refresh"

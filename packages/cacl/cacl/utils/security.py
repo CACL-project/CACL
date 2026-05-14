@@ -45,7 +45,7 @@ def set_auth_tokens(response: JSONResponse, access_token: str, refresh_token: st
             "token_type": "bearer",
             "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         }
-        new_body = response.render(existing_content)
+        new_body = json.dumps(existing_content).encode("utf-8")
         response.body = new_body
         response.headers["content-length"] = str(len(new_body))
 

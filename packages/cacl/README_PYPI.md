@@ -99,6 +99,39 @@ CACL integrates into it — cleanly and predictably.
 
 ---
 
+## DB schema and integration contract
+
+### No FK to your users table
+
+CACL does **not** define a foreign key from `jwt_tokens.user_id` to your `users.id` column.
+
+This is intentional to avoid forcing your application models to use CACL's `Base`.
+You keep full control of your own schema and ORM hierarchy.
+
+Token verification still loads the current user and **rejects tokens if the user does not
+exist or is inactive** — so the security guarantee is fully preserved at the application layer.
+
+If your app hard-deletes users, delete their JWT tokens in your application layer or run a
+cleanup job — there is no DB-level cascade without the FK.
+
+### Alembic setup with separate Base classes
+
+```python
+# alembic/env.py
+
+from your_app.core.base import Base as AppBase   # your application's Base
+from cacl.models.base import Base as CACLBase    # CACL's Base
+
+# Import models so metadata is populated before autogenerate runs
+from your_app.models.users import User           # noqa
+from cacl.models.jwt_token import JWTToken       # noqa
+
+# Pass both metadata objects — Alembic autogenerate sees all tables
+target_metadata = [AppBase.metadata, CACLBase.metadata]
+```
+
+---
+
 ## Installation
 
 ```bash

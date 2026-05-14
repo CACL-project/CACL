@@ -254,11 +254,44 @@ from cacl.models.jwt_token import JWTToken  # Import for metadata
 
 The model uses:
 - `id`: UUID primary key
-- `user_id`: Foreign key to `users.id`
+- `user_id`: Plain UUID column with index (no foreign key — see note below)
 - `token`: Unique token string
 - `token_type`: "access" or "refresh"
 - `is_blacklisted`: Boolean flag
 - `created_at`, `expires_at`: Timestamps
+
+### No foreign key to users
+
+**CACL does not define a database-level foreign key from `jwt_tokens.user_id` to `users.id`.**
+
+This is intentional — a DB-level FK would force your `User` model to share CACL's
+`DeclarativeBase`, breaking the "library, not framework" promise.
+
+**Security is preserved:** `verify_jwt_token()` still loads the current user via
+`get_user_model()` and raises HTTP 401 if the user does not exist or `is_active` is `False`.
+
+**Orphaned tokens:** if your application hard-deletes users, the `jwt_tokens` rows for
+those users will not be deleted automatically. You must handle cleanup in your
+application layer (e.g. `DELETE FROM jwt_tokens WHERE user_id = :uid` before deleting the
+user) or run a periodic cleanup job.
+
+### Alembic setup with two metadata objects
+
+Because `User` and `JWTToken` live on separate `Base` classes, pass both metadata
+objects to Alembic's `target_metadata` so autogenerate detects all tables:
+
+```python
+# alembic/env.py
+
+from your_app.core.base import Base as AppBase   # your application's Base
+from cacl.models.base import Base as CACLBase    # CACL's Base
+
+# Import models so metadata is populated before autogenerate runs
+from your_app.models.users import User           # noqa
+from cacl.models.jwt_token import JWTToken       # noqa
+
+target_metadata = [AppBase.metadata, CACLBase.metadata]
+```
 
 ## Testing
 
