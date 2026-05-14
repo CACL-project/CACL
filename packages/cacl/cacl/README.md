@@ -114,9 +114,14 @@ CACL requires only these three fields. Your model may include additional fields 
 
 ```python
 import uuid
-from sqlalchemy import Column, Boolean
+from sqlalchemy import Column, Boolean, String
 from sqlalchemy.dialects.postgresql import UUID
-from your_app.db import Base
+from sqlalchemy.orm import DeclarativeBase
+
+# Your application's own Base — not CACL's.
+# CACL does not require your models to share its Base.
+class Base(DeclarativeBase):
+    pass
 
 class User(Base):
     __tablename__ = "users"
@@ -131,7 +136,11 @@ class User(Base):
 
 ### 2. Register Session Maker at Startup
 
+Use FastAPI's `lifespan` context manager so registration happens at app startup,
+not at import time:
+
 ```python
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from cacl.db import register_session_maker
@@ -139,11 +148,19 @@ from cacl.db import register_session_maker
 engine = create_async_engine(DATABASE_URL)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
-# Register with CACL before app starts
-register_session_maker(async_session_maker)
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    register_session_maker(async_session_maker)
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 ```
+
+> **Note:** calling `register_session_maker()` at module level also works and remains
+> supported, but the `lifespan` pattern is preferred — it ties registration to the
+> application lifecycle and avoids side effects at import time.
 
 ### 3. Use Dependencies in Routes
 

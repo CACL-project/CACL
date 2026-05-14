@@ -44,10 +44,9 @@ def validate_auth_mode_consistency():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     validate_auth_mode_consistency()
+    register_session_maker(async_session_maker)
     yield
 
-
-register_session_maker(async_session_maker)
 
 app = FastAPI(title="CACL Demo App", lifespan=lifespan)
 
